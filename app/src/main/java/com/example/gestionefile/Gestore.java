@@ -1,6 +1,9 @@
 package com.example.gestionefile;
 
 import android.content.Context;
+import android.content.res.AssetManager;
+import android.content.res.Resources;
+import android.renderscript.ScriptGroup;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -8,6 +11,7 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
@@ -42,7 +46,7 @@ public class Gestore {
         return sb.toString() ;
     }
 
-    public String scriviFile(String nomeFile, Context c){   //COntesto area di memoria dove può recuperare le risorse dell'activity
+    public String scriviFile(String nomeFile, Context c){   //Contesto area di memoria dove può recuperare le risorse dell'activity
 
         FileOutputStream fileO; //Nome del file orientata ai byte
         String esito;   //Comunico all'utente quello che succede nel processo di lettura-scrittura e chiusura
@@ -55,7 +59,7 @@ public class Gestore {
             fileO.write(frase.getBytes(StandardCharsets.UTF_8));   //Gli passo il testo da scrivere però vuole i Bytes e quindi devo usare questo metodo per trasformarlo
             //3) Chiusura file in maniera esplicita anche se in questo caso la classe si chiude da sola (autclosable)
         fileO.close();
-        esito= "file scritto correttamente";
+        esito= " file scritto correttamente";
         }
         catch (FileNotFoundException e)
         {
@@ -72,22 +76,23 @@ public class Gestore {
         return esito;
     }
 
-   /* public String writeFileBW(String nomeFile, Context c){
-        String esito;
+    public String leggiFileRaw(Context c){
+        Resources res = c.getResources();   //vado nella ram dell'ativity (contesto)e in particolare area ram activity puntato su res
+        InputStream fileLetto = res.openRawResource(R.raw.brani);   //non c'è problema di eccezione perchè il file ce l'ho messo io
+        BufferedReader br = new BufferedReader(InputStreamReader(c.openFileInput(R.raw.brani)));
 
-        BufferedWriter br = null; //Prende un oggetto di tipo Output stream che
-        try {
-            br = new BufferedWriter(new OutputStreamWriter(c.openFileOutput(nomeFile, Context.MODE_APPEND)));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        try {
-            br.write("mio testo");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return esito;
+        return "";
     }
-*/
+
+    public String leggiFileAsset(Context c) {
+        AssetManager am = c.getAssets();
+        try {
+            //serve per aprire un file dentro quella cartella, file passato come parametro
+            //I file non sono controllati, senza puntatore in fase di installazione, il programmatore può sbagliare, bisogna gestire l'eccezione
+            InputStream is = am.open("brani.txt");
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+        return "";
+    }
 }
